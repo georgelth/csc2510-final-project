@@ -4,6 +4,17 @@
 strIP="$1"
 strTicketID="$2"
 
+if [ $strTicketID == "17065" ]; then
+indexNum=0;
+elif [ $strTicketID == "17042" ]; then
+indexNum=1;
+elif [ $strTicketID == "17066" ]; then
+indexNum=2;
+else
+indexNum=3;
+fi
+echo $indexNum
+
 # URL of all logged tickets
 strURL="https://www.swollenhippo.com/ServiceNow/systems/devTickets.php"
 
@@ -18,10 +29,10 @@ mkdir -p configurationLogs
 iterator=0
 for i in $strTicketIds
 do
-echo "TicketID: $i" >> $FILE_PATH/$i.log
+echo "TicketID: $2" >> $FILE_PATH/$i.log
 echo "Start DateTime: ${CURRENT_DATE}" >> $FILE_PATH/$i.log
 echo "Requestor: $(echo $arrResults | jq -r '.['"${iterator}"'].requestor')" >> $FILE_PATH/$i.log
-echo "External IP Address: "
+echo "External IP Address: $1" >> $FILE_PATH/$i.log
 echo "Hostname: "
 echo "Standard Configuration: $(echo $arrResults | jq -r '.['"${iterator}"'].standardConfig')" >> $FILE_PATH/$i.log
 iterator=$((iterator+1))
