@@ -11,11 +11,13 @@ strURL="https://www.swollenhippo.com/ServiceNow/systems/devTickets.php"
 arrResults=$(curl -s ${strURL})
 
 # log file handling
+FILE_PATH='configurationLogs/'
 strTicketIds=$(echo $arrResults | jq -r '.[].ticketID')
 mkdir -p configurationLogs
 for i in $strTicketIds
 do
-touch configurationLogs/$i.log
+echo "TicketID: $i" >> $FILE_PATH/$i.log
+echo "TicketID: $i"
 done
 
 # debug statements
