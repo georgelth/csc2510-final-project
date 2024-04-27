@@ -8,9 +8,15 @@ strTicketID="$2"
 strURL="https://www.swollenhippo.com/ServiceNow/systems/devTickets.php"
 
 # gets the raw data from the url and formats in .json using jq
-arrResults=$(curl ${strURL})
+arrResults=$(curl -s ${strURL})
 
 # log file handling
+strTicketIds=$(echo $arrResults | jq -r '.[].ticketID')
+mkdir -p configurationLogs
+for i in $strTicketIds
+do
+touch configurationLogs/$i.log
+done
 
 # debug statements
-echo $arrResults | jq
+echo $arrResults | jq '.[].ticketID'
