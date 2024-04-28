@@ -7,13 +7,13 @@ strTicketID="$2"
 # handles information parsing given a correct parameter
 if [ $strTicketID == "17065" ]; then
 indexNum=0;
-Hostname="instance1"
+Hostname="instance-1"
 elif [ $strTicketID == "17042" ]; then
 indexNum=1;
-Hostname="instance2"
+Hostname="instance-2"
 elif [ $strTicketID == "17066" ]; then
 indexNum=2;
-Hostname="instance3"
+Hostname="instance-3"
 else
 indexNum=3;
 Hostname="null"
@@ -29,14 +29,17 @@ arrResults=$(curl -s ${strURL})
 FILE_PATH="configurationLogs/${strTicketID}.log"
 CURRENT_DATE=$(date +"%d-%b-%Y %H:%M")
 strTicketIds=$(echo $arrResults | jq -r '.[].ticketID')
+strRequestor=$(echo $arrResults | jq -r '.['"${indexNum}"'].requestor')
+strSoftwarePackage=$(echo $arrResults | jq -r '.['"${indexNum}"'].softwarePackages[]')
 
 mkdir -p configurationLogs
 echo "TicketID: $strTicketID" >> $FILE_PATH
 echo "Start DateTime: ${CURRENT_DATE}" >> $FILE_PATH
-echo "Requestor: $(echo $arrResults | jq -r '.['"${indexNum}"'].requestor')" >> $FILE_PATH
-echo "External IP Address: $1" >> $FILE_PATH
+echo "Requestor: ${strRequestor}" >> $FILE_PATH
+echo "External IP Address: $strIP" >> $FILE_PATH
 echo "Hostname: $Hostname" >> $FILE_PATH
 echo "Standard Configuration: $(echo $arrResults | jq -r '.['"${indexNum}"'].standardConfig')" >> $FILE_PATH
+echo ""
 
 # debug statements
 #echo $arrResults | jq '.[]'
