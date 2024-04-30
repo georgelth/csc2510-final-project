@@ -39,10 +39,12 @@ echo "External IP Address: $strIP" >> $FILE_PATH
 echo "Hostname: $Hostname" >> $FILE_PATH
 echo "Standard Configuration: $(echo $arrResults | jq -r '.['"${indexNum}"'].standardConfig')" >> $FILE_PATH
 echo "" >> $FILE_PATH
+
 iterator=0
 while [ "$(echo "${arrResults}" | jq -r ".[${indexNum}].softwarePackages[${iterator}].name")" != 'null' ]
 do
-echo "working"
+echo "softwarePackage - $(echo "${arrResults}" | jq -r ".[${indexNum}].softwarePackages[${iterator}].name") - $(date +%s)" >> $FILE_PATH
+sudo apt-get install $(echo "${arrResults}" | jq -r ".[${indexNum}].softwarePackages[${iterator}].install")
 ((iterator++))
 done
 
