@@ -30,6 +30,7 @@ FILE_PATH="configurationLogs/${strTicketID}.log"
 CURRENT_DATE=$(date +"%d-%b-%Y %H:%M")
 strTicketIds=$(echo $arrResults | jq -r '.[].ticketID')
 strRequestor=$(echo $arrResults | jq -r '.['"${indexNum}"'].requestor')
+strAddSpace="false"
 
 mkdir -p configurationLogs
 echo "TicketID: $strTicketID" >> $FILE_PATH
@@ -44,9 +45,31 @@ iterator=0
 while [ "$(echo "${arrResults}" | jq -r ".[${indexNum}].softwarePackages[${iterator}].name")" != 'null' ]
 do
 echo "softwarePackage - $(echo "${arrResults}" | jq -r ".[${indexNum}].softwarePackages[${iterator}].name") - $(date +%s)" >> $FILE_PATH
-sudo apt-get install $(echo "${arrResults}" | jq -r ".[${indexNum}].softwarePackages[${iterator}].install")
+sudo apt-get install -y $(echo "${arrResults}" | jq -r ".[${indexNum}].softwarePackages[${iterator}].install")
+strAddSpace="true"
 ((iterator++))
 done
+
+if [ $strAddSpace == "true" ]; then
+echo "" >> $FILE_PATH
+strAddSpace="false"
+fi
+
+iterator=0
+while [ "$(echo "${arrResults}" | jq -r ".[${indexNum}].additionalConfigs[${iterator}].name")" != 'null' ]
+do
+echo "additionalConfig - $(echo "${arrResults}" | jq -r ".[${indexNum}].additionalConfigs[${iterator}].name") - $(date +%s)" >> $FILE_PATH
+sudo $(echo "${arrResults}" | jq -r ".[${indexNum}].additionalConfigs[${iterator}].config")
+strAddSpace="true"
+((iterator++))
+done
+
+if [ $strAddSpace == "true" ]; then
+echo "" >> $FILE_PATH
+strAddSpace="false"
+fi
+
+
 
 # debug statements
 #echo $arrResults | jq '.[]'
