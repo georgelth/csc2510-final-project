@@ -30,7 +30,6 @@ FILE_PATH="configurationLogs/${strTicketID}.log"
 CURRENT_DATE=$(date +"%d-%b-%Y %H:%M")
 strTicketIds=$(echo $arrResults | jq -r '.[].ticketID')
 strRequestor=$(echo $arrResults | jq -r '.['"${indexNum}"'].requestor')
-strSoftwarePackage=$(echo $arrResults | jq -r '.['"${indexNum}"'].softwarePackages[]')
 
 mkdir -p configurationLogs
 echo "TicketID: $strTicketID" >> $FILE_PATH
@@ -39,7 +38,13 @@ echo "Requestor: ${strRequestor}" >> $FILE_PATH
 echo "External IP Address: $strIP" >> $FILE_PATH
 echo "Hostname: $Hostname" >> $FILE_PATH
 echo "Standard Configuration: $(echo $arrResults | jq -r '.['"${indexNum}"'].standardConfig')" >> $FILE_PATH
-echo ""
+echo "" >> $FILE_PATH
+iterator=0
+while [ "$(echo "${arrResults}" | jq -r ".[${indexNum}].softwarePackages[${iterator}].name")" != 'null' ]
+do
+echo "working"
+((iterator++))
+done
 
 # debug statements
 #echo $arrResults | jq '.[]'
