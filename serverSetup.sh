@@ -50,11 +50,6 @@ strAddSpace="true"
 ((iterator++))
 done
 
-if [ $strAddSpace == "true" ]; then
-echo "" >> $FILE_PATH
-strAddSpace="false"
-fi
-
 iterator=0
 while [ "$(echo "${arrResults}" | jq -r ".[${indexNum}].additionalConfigs[${iterator}].name")" != 'null' ]
 do
@@ -69,7 +64,40 @@ echo "" >> $FILE_PATH
 strAddSpace="false"
 fi
 
+iterator=0
+while [ "$(echo "${arrResults}" | jq -r ".[${indexNum}].softwarePackages[${iterator}].name")" != 'null' ]
+do
+    packageName=$(echo "${arrResults}" | jq -r ".[${indexNum}].softwarePackages[${iterator}].name")
+    echo "Package Name: $packageName"  # Debugging
+    version=$(sudo apt show "$packageName" | grep -Po 'Version: \K[\d.]+')
+    echo "Version: $version"  # Debugging
+    echo "Version Check - ${packageName} - ${version}" >> "$FILE_PATH"
+    sudo apt-get install -y $(echo "${arrResults}" | jq -r ".[${indexNum}].softwarePackages[${iterator}].install")
+    strAddSpace="true"
+    ((iterator++))
+done
 
+if [ $strAddSpace == "true" ]; then
+echo "" >> $FILE_PATH
+strAddSpace="false"
+fi
+
+arrTicketStatus=$(curl -s "https://www.swollenhippo.com/ServiceNow/systems/devTickets/completed.php?TicketID=${strTicketID}")
+echo "${arrTicketStatus}" | jq -r '.[]' >> $FILE_PATH
+echo ""
+echo "Completed: $CURRENT_DATE" >> $FILE_PATH
+
+#iterator=0
+#while [ "$(echo "${arrResults}" | jq -r ".[${indexNum}].softwarePackages[${iterator}].name")" != 'null' ]
+#do
+#packageName=$(echo "${arrResults}" | jq -r ".[${indexNum}].softwarePackages[${iterator}].name")
+#version=$(sudo apt show "$packageName" | grep -oP 'Version: \K[\d.]+')
+#echo "$version"
+#echo "Version Check - $(echo "${arrResults}" | jq -r ".[${indexNum}].softwarePackages[${iterator}].name") - ${version}" >> $FILE_PATH
+#sudo apt-get install -y $(echo "${arrResults}" | jq -r ".[${indexNum}].softwarePackages[${iterator}].install")
+#strAddSpace="true"
+#((iterator++))
+#done
 
 # debug statements
 #echo $arrResults | jq '.[]'
