@@ -3,7 +3,7 @@
 # Name: serverSetup.sh
 # Author: George Howard
 # Class: CSC 2510
-# Purpose: Provisions fresh GCP servers with packages people request through .json file. Logs the output on the new server with vital information.
+# Purpose: Provisions fresh GCP servers with packages people request through .json file. Logs the output on the new server with vital information
 
 # parameters: destination ip address, ticket id
 strIP="$1"
