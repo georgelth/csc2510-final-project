@@ -1,5 +1,10 @@
 #! /bin/bash
 
+# Name: serverSetup.sh
+# Author: George Howard
+# Class: CSC 2510
+# Purpose: Provisions fresh GCP servers with packages people request through .json file. Logs the output on the new server with vital information.
+
 # parameters: destination ip address, ticket id
 strIP="$1"
 strTicketID="$2"
@@ -36,6 +41,7 @@ strTicketIds=$(echo $arrResults | jq -r '.[].ticketID')
 strRequestor=$(echo $arrResults | jq -r '.['"${indexNum}"'].requestor')
 strAddSpace="false"
 
+# adds a new line correctly depending if any while loops have executed (purely for cosmetic readability)
 spaceHandler(){
     if [ $1 == "true" ]; then
         echo "" >> $FILE_PATH
@@ -72,7 +78,7 @@ do
     ((iterator++))
 done
 
-# adds a new line correctly depending if any while loops have executed (purely for cosmetic readability)
+# function call for making log files prettier
 spaceHandler $strAddSpace
 strAddSpace="false"
 
@@ -81,18 +87,18 @@ iterator=0
 while [ "$(echo "${arrResults}" | jq -r ".[${indexNum}].softwarePackages[${iterator}].name")" != 'null' ]
 do
     packageName=$(echo "${arrResults}" | jq -r ".[${indexNum}].softwarePackages[${iterator}].install")
-    echo "Package Name: $packageName"  # Debugging
     version=$(sudo apt show "$packageName" | grep -Po 'Version: \K[\d.]+')
-    echo "Version: $version"  # Debugging
     echo "Version Check - ${packageName} - ${version}" >> "$FILE_PATH"
     sudo apt-get install -y $(echo "${arrResults}" | jq -r ".[${indexNum}].softwarePackages[${iterator}].install")
     strAddSpace="true"
     ((iterator++))
 done
 
+# pretty log file function call
 spaceHandler $strAddSpace
 strAddSpace="false"
 
+# grabs ticket status from the URL and pastes the output to the last part of the .log file, marking it as complete with a UTC timestamp
 arrTicketStatus=$(curl -s "https://www.swollenhippo.com/ServiceNow/systems/devTickets/completed.php?TicketID=${strTicketID}")
 echo "${arrTicketStatus}" | jq -r '.[]' >> $FILE_PATH
 echo "" >> $FILE_PATH
