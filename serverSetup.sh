@@ -1,34 +1,32 @@
 #! /bin/bash
-
 # Name: serverSetup.sh
 # Author: George Howard
 # Class: CSC 2510
 # Purpose: Provisions fresh GCP servers with packages people request through .json file. Logs the output on the new server with vital information
 
+# installs jq to prevent any errors parsing through files on a new linux instance
+sudo apt-get update
+sudo apt-get install jq
+
 # parameters: destination ip address, ticket id
 strIP="$1"
 strTicketID="$2"
-
-# handles information parsing given a correct parameter
-if [ $strTicketID == "17065" ]; then
-    indexNum=0;
-    Hostname="instance-1"
-elif [ $strTicketID == "17042" ]; then
-    indexNum=1;
-    Hostname="instance-2"
-elif [ $strTicketID == "17066" ]; then
-    indexNum=2;
-    Hostname="instance-3"
-else
-    indexNum=3;
-    Hostname="null"
-fi
 
 # URL of all logged tickets
 strURL="https://www.swollenhippo.com/ServiceNow/systems/devTickets.php"
 
 # gets the raw data from the url and formats in .json using jq
 arrResults=$(curl -s ${strURL})
+
+# handles information parsing given a correct parameter
+intTicketCount=$(echo arrResults | jq length)
+intTicketCountCurrent=0
+while [ ${intTicketCountCurrent} -lt ${intTicketCount} ]; do
+if [ ${strTicketID} = $(echo arrResults | jq -r [${intTicketCountCurrent}].ticketID) ]; then
+indexNum=${intTicketCountCurrent}
+fi
+((intTicketCount++))
+done
 
 # *********************
 # * LOG FILE HANDLING *
